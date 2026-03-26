@@ -83,7 +83,7 @@ STATUS OK
 ERROR TEMP_HIGH
 COMMAND INVALID
 ```
-
+---
 ## Detection Scope (Planned)
 
 The system is designed to evolve toward detecting:
@@ -94,9 +94,12 @@ The system is designed to evolve toward detecting:
 - abnormal message frequency
 - communication loss (e.g., missing heartbeat)
 - unauthorized or unknown client activity
+- unusual client connection behavior
+- suspicious IP-based activity patterns
 - telemetry inconsistencies
 - rule violations in expected message flow
 
+---
 ## Project Structure 
 ```bash
 threat-detection-server/
@@ -116,6 +119,9 @@ threat-detection-server/
 ├── Makefile
 └── README.md
 ```
+
+---
+
 ## Architecture 
 ```bash 
 Multiple Clients
@@ -133,29 +139,38 @@ Logger
 Threat / Status Output
 ```
 
+---
+
 ## Components
-Server:
+
+#### Server
 - initializes TCP listener
 - accepts multiple client connections
 - spawns a thread per client
 - receives incoming messages
 - forwards client/message data for analysis
-Analyzer:
+
+#### Analyzer
 - interprets messages
 - applies detection logic
 - tracks threat state per client
 - determines client-level and system-level state transitions
-- Logger
+
+#### Logger
 - records events with timestamps
 - stores client identity (IP/connection), message, classification, and state
-Main
+
+#### Main
 - orchestrates system flow
 - initializes components
 - manages lifecycle
 
-## Architecture Diagram 
+## Architecture Diagram
 
-The diagram will illustrate: 
+A visual architecture diagram will be added here (planned using draw.io).
+
+This diagram will represent the system at a component level and illustrate:
+
 - multiple external clients
 - TCP listener and connection handling
 - thread-per-client execution model
@@ -174,8 +189,11 @@ This system can conceptually apply to:
 - supporting security monitoring pipelines
 - acting as an analysis layer in a larger control system
 
+---
+
 ## Development Roadmap
-Phase 1: Core Detection Server
+
+### Phase 1: Core Detection Server
 - concurrent TCP server for multiple clients
 - thread-per-client connection handling
 - plain-text message handling
@@ -183,32 +201,37 @@ Phase 1: Core Detection Server
 - per-client threat-state classification
 - file-based logging
 
-Phase 2: Enhanced Monitoring
+### Phase 2: Enhanced Monitoring
 - improved detection rules
 - message pattern analysis
 - heartbeat monitoring
 - richer per-client state analysis
 - structured log format improvements
 
-Phase 3: Data & Persistence
+### Phase 3: Data & Persistence
 - database integration (e.g., PostgreSQL)
 - persistent event storage
 - queryable log system
 
-Phase 4: Secure Communication
+### Phase 4: Secure Communication
 - encrypted message transport
 - message integrity validation
 - client authentication and identity validation
 
-Phase 5: Response & Integration
+### Phase 5: Response & Integration
 - alerting mechanisms
 - integration with telemetry systems
 - automated response workflows
+
+
+---
 
 ## Relationship to Other Systems
 
 This project is designed to integrate with a previously developed system: Secure Communication and Monitoring System
 That system focuses on secure telemetry transmission, encryption, and hardware-level monitoring. The Threat Detection & Response Server acts as a backend intelligence layer, responsible for analyzing incoming data and determining system risk levels.
+
+---
 
 ## Build and Run
 
@@ -224,6 +247,9 @@ Testing example:
 ```bash 
 nc localhost 8080
 ```
+
+---
+
 ## Status
 Currently in early development.
 
