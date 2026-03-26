@@ -166,11 +166,11 @@ The diagram will illustrate:
 
 This system can conceptually apply to:
 
-monitoring uncrewed vehicle telemetry channels
-backend monitoring for distributed systems
-detecting anomalies in system command streams
-supporting security monitoring pipelines
-acting as an analysis layer in a larger control system
+- monitoring uncrewed vehicle telemetry channels
+- backend monitoring for distributed systems
+- detecting anomalies in system command streams
+- supporting security monitoring pipelines
+- acting as an analysis layer in a larger control system
 
 ## Development Roadmap
 Phase 1: Core Detection Server
