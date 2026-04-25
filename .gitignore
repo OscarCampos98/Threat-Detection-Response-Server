@@ -2,7 +2,7 @@
 *.o
 *.out
 *.exe
-threat_server
+thread_server
 
 # Logs
 logs/*.txt
