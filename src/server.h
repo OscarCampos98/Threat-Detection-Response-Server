@@ -21,12 +21,15 @@ class Server {
         int server_fd; // File descriptor for the server socket
         bool running;   // track if server is running
 
+        // Handle client connection (to be implemented later)
+        void handleClient(int client_fd, const char* client_ip, int client_port);  
+    
     public:
     
-    //constructors reciebes the port number
-    explicit Server(int port);
-    bool start();
-    void stop();
+        //constructors reciebes the port number
+        explicit Server(int port);
+        bool start();
+        void stop();
 
 };
 

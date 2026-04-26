@@ -87,15 +87,66 @@ bool Server::start() {
     Convert the client's IP address to a human-readable format 
     */
     char client_ip[INET_ADDRSTRLEN];
+
     inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
-    cout << "[INFO] Accepted connection from " << client_ip 
-        << ":" << ntohs(client_addr.sin_port) << "\n";
+
+    int client_port = ntohs(client_addr.sin_port);
+    
+    cout << "[INFO] Client connected from "
+              << client_ip << ":" << client_port << "\n";
     
     // Close the client connection (for now)
-    close(client_fd);
-    cout << "[INFO] Client connection closed.\n";
+    handleClient(client_fd, client_ip, client_port);
     return true;
 }
+
+
+void Server::handleClient(int client_fd, const char* client_ip, int client_port) {
+    //buffer to hold incoming data from the client 
+    //1024 bytes should be sufficient for now
+
+    char buffer[1024];
+
+    while(true){
+        /*
+        clear the buffer before receiving new data
+        */
+
+        memset(buffer, 0, sizeof(buffer));
+
+         /*
+            recv() waits for data from the client.
+
+            Return values:
+            > 0  -> bytes received
+            0    -> client disconnected
+            < 0  -> receive error
+        */
+
+        ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+
+        if(bytes_received >0){
+            cout<< "[MESSAGE] Received from " << client_ip << ":" << client_port << " -> " << buffer << "\n";
+        }
+
+        else if (bytes_received == 0){
+            cout << "[INFO] Client disconnected: " << client_ip << ":" << client_port << "\n";
+            break;
+        }
+        else{
+            cerr << "[ERROR] Failed to receive data from client: " << client_ip << ":" << client_port << "\n";
+            break;
+        }
+    }
+    /*
+    Close the client socket after communication is done
+    */
+    close(client_fd);
+    cout<< "[INFO] Closed connection with client: " << client_ip << ":" << client_port << "\n";
+
+}
+
+
 
 void Server::stop() {
     //Close the server socket if open 

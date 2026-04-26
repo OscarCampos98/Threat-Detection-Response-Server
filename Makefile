@@ -10,7 +10,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -pthread
 
 # Output binary name
-TARGET = thread_server
+TARGET = threat_server
 
 # Source files
 SRCS = src/main.cpp src/server.cpp 
