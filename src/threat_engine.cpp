@@ -25,7 +25,7 @@ ThreatResult ThreatEngine::analyze(const ParsedMessage &message)
     {
         return {
             ThreatLevel::NORMAL,
-            "HeartBeat recieve"};
+            "HeartBeat recieved"};
     }
 
     /*
@@ -44,7 +44,7 @@ ThreatResult ThreatEngine::analyze(const ParsedMessage &message)
         }
         return {
             ThreatLevel::SUSPICIOUS,
-            "Non-OK Status reported"};
+            "Non-OK status reported"};
     }
 
     // ERROR messages indicates abnormal behavious or fault conditions
