@@ -1,4 +1,5 @@
 #include "server.h"
+#include "parser.h"
 
 #include <iostream>
 #include <cstring>
@@ -29,30 +30,32 @@ using namespace std;
 
 */
 
-Server::Server(int port) : 
-    port(port), server_fd(-1), running(false) {}
+Server::Server(int port) : port(port), server_fd(-1), running(false) {}
 
-bool Server::start() {
-    
+bool Server::start()
+{
+
     // Create socket
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd < 0) {
+    if (server_fd < 0)
+    {
         cerr << "[ERROR] Failed to create socket\n";
         return false;
     }
 
     /*
-        Allow quick server restart without waiting for a port 
+        Allow quick server restart without waiting for a port
     */
 
     int opt = 1;
-    if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+    {
         cerr << "[ERROR] Failed to set socket options\n";
         close(server_fd);
         return false;
     }
 
-    //Define the server address
+    // Define the server address
     sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -60,14 +63,16 @@ bool Server::start() {
     server_addr.sin_port = htons(port);
 
     // Bind the socket
-    if(bind(server_fd, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr)) < 0) {
+    if (bind(server_fd, reinterpret_cast<sockaddr *>(&server_addr), sizeof(server_addr)) < 0)
+    {
         cerr << "[ERROR] Failed to bind socket to port " << port << "\n";
         close(server_fd);
         return false;
     }
 
     // Listen for incoming connections (10 is the backlog size)
-    if(listen(server_fd, 10) < 0) {
+    if (listen(server_fd, 10) < 0)
+    {
         cerr << "[ERROR] Failed to listen on socket\n";
         close(server_fd);
         return false;
@@ -85,51 +90,53 @@ bool Server::start() {
     Each client is handle in its own detached thread
     */
 
-    while(running){
+    while (running)
+    {
         sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
 
-        int client_fd = accept(server_fd, reinterpret_cast<sockaddr*>(&client_addr), &client_len);
+        int client_fd = accept(server_fd, reinterpret_cast<sockaddr *>(&client_addr), &client_len);
 
-        if (client_fd < 0) {
+        if (client_fd < 0)
+        {
 
-            //If the server is still soppused to be running, 
-            //This is an actual accept error. 
+            // If the server is still soppused to be running,
+            // This is an actual accept error.
 
-            if(running){
-                cerr << "[ERROR] Failed to accept client connection\n"; 
+            if (running)
+            {
+                cerr << "[ERROR] Failed to accept client connection\n";
             }
             continue;
         }
-        
+
         /*
-        Convert the client's IP address to a human-readable format 
+        Convert the client's IP address to a human-readable format
         */
         char client_ip[INET_ADDRSTRLEN];
 
         inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
 
         int client_port = ntohs(client_addr.sin_port);
-        
+
         cout << "[INFO] Client connected from "
-                << client_ip << ":" << client_port << "\n";
-        
+             << client_ip << ":" << client_port << "\n";
+
         /*
         Start a new thread to handle the client connection
-        
-        important: 
-        client_ip is copied into a std::string because the local 
+
+        important:
+        client_ip is copied into a std::string because the local
         characters array will go out of the scope of the loop repeats
-        
+
         */
         string client_ip_str(client_ip);
         thread client_thread(
-            &Server::handleClient, 
+            &Server::handleClient,
             this,
             client_fd,
             client_ip_str,
-            client_port
-        );
+            client_port);
 
         /*
         Detach means the trhread runs independently
@@ -138,48 +145,71 @@ bool Server::start() {
         but detach is acceptable for now
         */
         client_thread.detach();
-
-
     }
-
 
     return true;
 }
 
-
-void Server::handleClient(int client_fd, string client_ip, int client_port) {
-    //buffer to hold incoming data from the client 
-    //1024 bytes should be sufficient for now
+void Server::handleClient(int client_fd, string client_ip, int client_port)
+{
+    // buffer to hold incoming data from the client
+    // 1024 bytes should be sufficient for now
 
     char buffer[1024];
+    Parser parser;
 
-    while(true){
+    while (true)
+    {
         /*
         clear the buffer before receiving new data
         */
 
         memset(buffer, 0, sizeof(buffer));
 
-         /*
-            recv() waits for data from the client.
+        /*
+           recv() waits for data from the client.
 
-            Return values:
-            > 0  -> bytes received
-            0    -> client disconnected
-            < 0  -> receive error
-        */
+           Return values:
+           > 0  -> bytes received
+           0    -> client disconnected
+           < 0  -> receive error
+       */
 
         ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
 
-        if(bytes_received >0){
-            cout<< "[MESSAGE] Received from " << client_ip << ":" << client_port << " -> " << buffer << "\n";
+        if (bytes_received > 0)
+        {
+            string raw_message(buffer, bytes_received);
+            ParsedMessage parsed = parser.parse(raw_message);
+
+            cout << "[MESSAGE] "
+                 << client_ip << " : " << client_port
+                 << " -> " << parsed.raw << "\n";
+
+            cout << "[PARSED] Type: "
+                 << Parser::messageTypeToString(parsed.type)
+                 << " | Valid: " << (parsed.valid ? "true" : "false");
+
+            if (!parsed.payload.empty())
+            {
+                cout << " | Payload: " << parsed.payload;
+            }
+
+            if (!parsed.error.empty())
+            {
+                cout << " | Error:" << parsed.error;
+            }
+
+            cout << "\n";
         }
 
-        else if (bytes_received == 0){
+        else if (bytes_received == 0)
+        {
             cout << "[INFO] Client disconnected: " << client_ip << ":" << client_port << "\n";
             break;
         }
-        else{
+        else
+        {
             cerr << "[ERROR] Failed to receive data from client: " << client_ip << ":" << client_port << "\n";
             break;
         }
@@ -188,15 +218,14 @@ void Server::handleClient(int client_fd, string client_ip, int client_port) {
     Close the client socket after communication is done
     */
     close(client_fd);
-    cout<< "[INFO] Closed connection with client: " << client_ip << ":" << client_port << "\n";
-
+    cout << "[INFO] Closed connection with client: " << client_ip << ":" << client_port << "\n";
 }
 
-
-
-void Server::stop() {
-    //Close the server socket if open 
-    if (server_fd >= 0) {
+void Server::stop()
+{
+    // Close the server socket if open
+    if (server_fd >= 0)
+    {
         close(server_fd);
         server_fd = -1;
     }
