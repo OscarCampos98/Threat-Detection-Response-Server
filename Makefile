@@ -13,7 +13,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -pthread
 TARGET = threat_server
 
 # Source files
-SRCS = src/main.cpp src/server.cpp src/parser.cpp src/threat_engine.cpp
+SRCS = src/main.cpp src/server.cpp src/parser.cpp src/threat_engine.cpp src/client_state.cpp
 
 # Default build target 
 all:

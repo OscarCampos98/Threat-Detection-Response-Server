@@ -1,6 +1,7 @@
 #include "server.h"
 #include "parser.h"
 #include "threat_engine.h"
+#include "client_state.h"
 
 #include <iostream>
 #include <cstring>
@@ -185,6 +186,8 @@ void Server::handleClient(int client_fd, string client_ip, int client_port)
             ParsedMessage parsed = parser.parse(raw_message);
             ThreatResult result = threat_engine.analyze(parsed);
 
+            ClientStateUpdate state_update = client_state_tracker.updateClientState(client_ip, result);
+
             cout << "[MESSAGE] "
                  << client_ip << " : " << client_port
                  << " -> " << parsed.raw << "\n";
@@ -208,6 +211,17 @@ void Server::handleClient(int client_fd, string client_ip, int client_port)
             cout << "[THREAT] Level: "
                  << ThreatEngine::threatLevelToString(result.level)
                  << " | Reason: " << result.reason << "\n";
+
+            cout << "[STATE] Client: "
+                 << state_update.client_id
+                 << " | State: "
+                 << ClientStateTracker::stateToString(state_update.current_state)
+                 << " | Events: " << state_update.total_events
+                 << " | Normal: " << state_update.normal_events
+                 << " | Suspicious: " << state_update.suspicious_events
+                 << " | Critical: " << state_update.critical_events
+                 << " | Reason: " << state_update.reason
+                 << "\n";
         }
 
         else if (bytes_received == 0)
