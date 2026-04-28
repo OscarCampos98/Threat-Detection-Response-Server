@@ -32,7 +32,11 @@ using namespace std;
 
 */
 
-Server::Server(int port) : port(port), server_fd(-1), running(false) {}
+Server::Server(int port)
+    : port(port),
+      server_fd(-1),
+      running(false),
+      logger("logs/threat_log.txt") {}
 
 bool Server::start()
 {
@@ -187,6 +191,13 @@ void Server::handleClient(int client_fd, string client_ip, int client_port)
             ThreatResult result = threat_engine.analyze(parsed);
 
             ClientStateUpdate state_update = client_state_tracker.updateClientState(client_ip, result);
+
+            logger.logEvent(
+                client_ip,
+                client_port,
+                parsed,
+                result,
+                state_update);
 
             cout << "[MESSAGE] "
                  << client_ip << " : " << client_port

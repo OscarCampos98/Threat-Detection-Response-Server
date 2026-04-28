@@ -2,6 +2,7 @@
 #define SERVER_H
 
 #include "client_state.h"
+#include "logger.h"
 
 #include <string>
 
@@ -27,6 +28,7 @@ private:
     int server_fd; // File descriptor for the server socket
     bool running;  // track if server is running
     ClientStateTracker client_state_tracker;
+    Logger logger;
 
     // Handle client connection (to be implemented later)
     void handleClient(int client_fd, string client_ip, int client_port);
