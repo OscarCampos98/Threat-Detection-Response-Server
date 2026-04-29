@@ -48,6 +48,16 @@ Rather than treating security as only encryption or authentication, the system f
 Secure communication, authentication, and stronger client identity validation are planned future improvements. The first goal is to build a clean detection and response foundation.
 
 ---
+## Current Features
+- Multi-client TCP server
+- Thread-per-client connection handling
+- Plain-text message parsing
+- Rule-based threat classification
+- Per-client state tracking
+- Response decision engine
+- File-based structured logging
+
+---
 
 ## Core Concepts
 
