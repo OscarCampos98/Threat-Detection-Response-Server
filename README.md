@@ -89,7 +89,7 @@ State transitions are driven by message content, client behavior, connection pat
 
 ---
 
-##Response Actions
+## Response Actions
 
 Response refers to backend-driven actions based on threat severity.
 
@@ -109,7 +109,7 @@ Possible responses include:
 The server is planned to support structured messages. Initial versions may use newline-delimited JSON or structured plain text.
 
 Example JSON message:
-```bash
+```JSON
 {
   "client_id": "sensor_01",
   "timestamp": "2026-04-23T18:30:00Z",
@@ -142,7 +142,7 @@ The system is designed to detect and respond to:
 
 ---
 
-##Project Structure
+## Project Structure
 
 Initial server-focused structure:
 ```bash
@@ -221,8 +221,14 @@ Threat / Status Output
 - initializes TCP listener
 - accepts multiple client connections
 - spawns a thread per client
-= receives incoming messages
+- receives incoming messages
 - forwards client/message data into the processing pipeline
+
+#### Message Parser
+- validates incoming message format
+- extracts message type and payload
+- marks unknown or malformed messages as invalid
+- forwards structured results to the threat engine
 
 #### Threat Engine
 - applies rule-based detection logic
@@ -356,11 +362,83 @@ Testing example:
 ```bash 
 nc localhost 8080
 ```
+---
+## Testing
 
+The project includes scripted test clients for validating the server pipeline.
+
+### Manual Test Client
+
+The manual client sends a predefined sequence of messages through a single TCP connection.
+```bash 
+python3 tests/manual_client.py
+```
+
+This test validates:
+
+- normal message handling
+- malformed input detection
+- rule-based threat classification
+- suspicious activity escalation
+- response decision generation
+- file-based logging
+
+### Multi-Client Test
+
+The multi-client test simulates multiple clients connecting to the server concurrently.
+```bash
+python3 tests/multi_client_test.py
+```
+
+This test validates:
+
+- multiple client connections
+- thread-per-client handling
+- concurrent message processing
+- logging under concurrent activity
+- pipeline stability with multiple active clients
+
+When running locally, simulated clients may share the same localhost IP address (127.0.0.1) while using different source ports. The current client state tracker uses IP address as the client identity, so local simulated clients may share the same tracked state.
+
+More testing details are available in:
+
+```text
+docs/test_cases.md
+```
+
+## Also update Project Structure
+
+Replace the `tests/` and `docs/` parts with:
+
+```markdown
+├── docs/
+│   ├── architecture.md
+│   └── test_cases.md
+│
+├── tests/
+│   ├── manual_client.py
+│   └── multi_client_test.py
+```
 ---
 
 ## Status
-Currently in early development.
+
+Current baseline implementation completed:
+
+- multi-client TCP server
+- message parser
+- threat engine
+- per-client state tracker
+- response decision engine
+- file-based logger
+- manual and multi-client test scripts
+
+Next focus areas:
+
+- improved client identity model
+- JSON message support
+- heartbeat timeout detection
+- stronger automated testing
 
 ## Author
 
