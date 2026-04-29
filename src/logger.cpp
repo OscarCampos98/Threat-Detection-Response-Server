@@ -84,7 +84,7 @@ void Logger::logEvent(
     /*
         Write one structured event record.
     */
-    log_file << "[EVENT]\n";
+    log_file << "\n[EVENT]\n";
     log_file << "timestamp=" << getCurrentTimestamp() << "\n";
     log_file << "client_ip=" << client_ip << "\n";
     log_file << "client_port=" << client_port << "\n";
