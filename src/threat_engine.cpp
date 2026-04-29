@@ -25,7 +25,7 @@ ThreatResult ThreatEngine::analyze(const ParsedMessage &message)
     {
         return {
             ThreatLevel::NORMAL,
-            "Heartbeat recieved"};
+            "Heartbeat received"};
     }
 
     /*
