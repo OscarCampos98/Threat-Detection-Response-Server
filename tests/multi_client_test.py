@@ -31,20 +31,20 @@ SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 8080
 
 CLIENT_SCENARIOS = {
-    "client_normal": [
-        "HEARTBEAT",
-        "STATUS OK",
-        "HEARTBEAT",
+    "sensor_01": [
+        '{"client_id":"sensor_01","timestamp":"2026-04-30T09:40:00Z","event_type":"HEARTBEAT","status":"OK","request_id":"s1-001"}',
+        '{"client_id":"sensor_01","timestamp":"2026-04-30T09:40:05Z","event_type":"STATUS","status":"OK","request_id":"s1-002"}',
+        '{"client_id":"sensor_01","timestamp":"2026-04-30T09:40:10Z","event_type":"AUTH_ATTEMPT","status":"SUCCESS","request_id":"s1-003"}',
     ],
-    "client_suspicious": [
-        "HEARTBEAT",
-        "ERROR TEMP_HIGH",
-        "ERROR TEMP_HIGH",
+    "sensor_02": [
+        '{"client_id":"sensor_02","timestamp":"2026-04-30T09:40:00Z","event_type":"HEARTBEAT","status":"OK","request_id":"s2-001"}',
+        '{"client_id":"sensor_02","timestamp":"2026-04-30T09:40:05Z","event_type":"ERROR","status":"TEMP_HIGH","request_id":"s2-002"}',
+        '{"client_id":"sensor_02","timestamp":"2026-04-30T09:40:10Z","event_type":"ERROR","status":"TEMP_HIGH","request_id":"s2-003"}',
     ],
-    "client_critical": [
-        "COMMAND INVALID",
-        "BADMESSAGE",
-        "STATUS",
+    "sensor_03": [
+        '{"client_id":"sensor_03","timestamp":"2026-04-30T09:40:00Z","event_type":"COMMAND","status":"INVALID","request_id":"s3-001"}',
+        '{"client_id":"sensor_03","timestamp":"2026-04-30T09:40:05Z","event_type":"AUTH_ATTEMPT","status":"FAILED","request_id":"s3-002"}',
+        '{"client_id":"sensor_03","event_type":"AUTH_ATTEMPT","status":"FAILED"',
     ],
 }
 

@@ -107,13 +107,23 @@ Possible responses include:
 ---
 ## Example Message Format
 
-The server is planned to support structured messages. Initial versions may use newline-delimited JSON or structured plain text.
 
-Example JSON message:
-```JSON
+The server currently supports both legacy plain-text messages and structured JSON messages.
+
+Plain-text examples:
+
+```text
+HEARTBEAT
+STATUS OK
+ERROR TEMP_HIGH
+COMMAND INVALID
+```
+
+JSON example:
+```json
 {
   "client_id": "sensor_01",
-  "timestamp": "2026-04-23T18:30:00Z",
+  "timestamp": "2026-04-30T09:40:00Z",
   "event_type": "AUTH_ATTEMPT",
   "status": "FAILED",
   "request_id": "abc123"
@@ -366,7 +376,16 @@ nc localhost 8080
 ---
 ## Testing
 
-The project includes scripted test clients for validating the server pipeline.
+The test scripts now include both plain-text and JSON event messages.
+
+JSON tests validate:
+
+- structured event parsing
+- event type mapping
+- logical client ID extraction
+- request ID extraction
+- JSON parse error handling
+- classification of authentication events
 
 ### Manual Test Client
 

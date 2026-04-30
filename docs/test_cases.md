@@ -153,6 +153,74 @@ client_port=46132
 client_ip=127.0.0.1
 client_port=46148
 ```
+---
+## JSON Message Testing
+
+The server now supports both legacy plain-text messages and structured JSON messages.
+
+JSON messages allow the server to receive richer event data, including:
+
+- logical client ID
+- event timestamp
+- event type
+- event status
+- request ID
+
+Example JSON message:
+
+```json
+{
+  "client_id": "sensor_01",
+  "timestamp": "2026-04-30T09:40:00Z",
+  "event_type": "AUTH_ATTEMPT",
+  "status": "FAILED",
+  "request_id": "s1-001"
+}
+```
+
+Supported JSON Fields
+```text
+Field	      Required	    Description
+event_type	Yes	          Defines the type of event being reported
+client_id	  No	          Logical client/device identifier
+timestamp	  No	          Client-reported event timestamp
+status	    No,           Event result or payload
+            but required by some event types  	
+request_id	No	          Request identifier for future replay detection
+```
+
+Supported JSON Event Types:
+```text
+event_type	      Example status	    Expected Classification
+HEARTBEAT	        OK                	NORMAL
+STATUS	          OK                	NORMAL
+STATUS	          DEGRADED	          SUSPICIOUS
+ERROR	            TEMP_HIGH	          SUSPICIOUS
+COMMAND	          INVALID           	CRITICAL
+AUTH_ATTEMPT	    SUCCESS           	NORMAL
+AUTH_ATTEMPT	    FAILED            	SUSPICIOUS
+```
+
+Malformed JSON messages should be parsed as invalid and classified as CRITICAL.
+
+Log Output for JSON Messages
+
+JSON events should include additional log fields:
+```text
+is_json=true
+message_client_id=sensor_01
+message_timestamp=2026-04-30T09:40:00Z
+event_type=AUTH_ATTEMPT
+status=FAILED
+request_id=s1-001
+```
+The server also records the TCP connection identity separately:
+```text
+client_id=127.0.0.1:43070
+client_ip=127.0.0.1
+client_port=43070
+```
+---
 
 # Important Note About Localhost Testing
 

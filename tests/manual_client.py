@@ -28,6 +28,7 @@ SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 8080
 
 TEST_MESSAGES = [
+    #Plain-text messages
     "HEARTBEAT",
     "STATUS OK",
     "ERROR TEMP_HIGH",
@@ -37,6 +38,16 @@ TEST_MESSAGES = [
     "BADMESSAGE",
     "STATUS",
     "ERROR",
+
+     # JSON messages
+    '{"client_id":"sensor_01","timestamp":"2026-04-29T18:30:00Z","event_type":"HEARTBEAT","status":"OK","request_id":"req001"}',
+    '{"client_id":"sensor_01","timestamp":"2026-04-29T18:30:05Z","event_type":"AUTH_ATTEMPT","status":"SUCCESS","request_id":"req002"}',
+    '{"client_id":"sensor_01","timestamp":"2026-04-29T18:30:10Z","event_type":"AUTH_ATTEMPT","status":"FAILED","request_id":"req003"}',
+    '{"client_id":"sensor_01","timestamp":"2026-04-29T18:30:15Z","event_type":"ERROR","status":"TEMP_HIGH","request_id":"req004"}',
+    '{"client_id":"sensor_01","timestamp":"2026-04-29T18:30:20Z","event_type":"COMMAND","status":"INVALID","request_id":"req005"}',
+
+    # Malformed JSON
+    '{"client_id":"sensor_01","event_type":"AUTH_ATTEMPT","status":"FAILED"'
 ]
 
 def main():
